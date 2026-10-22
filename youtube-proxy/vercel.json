@@ -1,0 +1,25 @@
+export default async function handler(req, res) {
+    // السماح بالاتصالات من أي تطبيق
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET');
+
+    const channelInput = req.query.channel;
+
+    if (!channelInput) {
+        return res.status(400).json({ error: "Channel parameter is missing" });
+    }
+
+    // ضع مفتاح يوتيوب الخاص بك هنا سراً داخل السيرفر فقط
+    const YOUTUBE_API_KEY = "ضع_مفتاح_الـ_API_الخاص_بك_هنا";
+
+    try {
+        const youtubeUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(channelInput)}&type=channel&maxResults=1&key=${YOUTUBE_API_KEY}`;
+        
+        const ytResponse = await fetch(youtubeUrl);
+        const ytData = await ytResponse.json();
+
+        return res.status(200).json(ytData);
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
